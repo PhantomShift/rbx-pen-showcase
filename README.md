@@ -103,8 +103,12 @@ that this project also makes use of, so shoutout to sawdust for being cool.
 
 ## Example Media
 
-How Roblox Must've Felt Setting the 32MB EditableImage Limit
+"How Roblox Must've Felt Setting the 32MB EditableImage Limit"
 
 ![Example illustration](assets/painting.png)
 
 ![Blackbeared Writing Meme Lol](assets/painting_cropped.png)
+
+Short speed paint example
+
+![Speed paint example](assets/editor2c.webp)
