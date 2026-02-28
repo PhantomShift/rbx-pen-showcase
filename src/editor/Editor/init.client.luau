@@ -14,6 +14,7 @@ local Janitor = require(ReplicatedStorage.Packages.janitor)
 local ColorPicker = require(ReplicatedStorage.External.ColorPicker)
 
 local CurveEditor = require(ReplicatedStorage.Shared.CurveEditor)
+local Compositor = require(ReplicatedStorage.Shared.Compositor)
 
 local History = require(script.History)
 
@@ -673,7 +674,7 @@ local KeyModifierTools = {
 		Nested = {
 			{
 				KeyCode = Enum.KeyCode.Space,
-				Tool = function(input: Vector3)
+				Tool = function(_rel, input: Vector3)
 					local delta = input - last_input
 					zoom_percent = math.clamp(zoom_percent + delta.X * 0.0015 * zoom_percent, MIN_ZOOM, MAX_ZOOM)
 					updateZoom()
@@ -683,21 +684,34 @@ local KeyModifierTools = {
 	},
 	{
 		KeyCode = Enum.KeyCode.Space,
-		Tool = function(input: Vector3)
+		Tool = function(_rel, input: Vector3)
 			local delta = input - last_input
 			Canvas.Position += UDim2.fromOffset(delta.X, delta.Y)
 		end,
 	},
 	{
 		KeyCode = Enum.KeyCode.LeftShift,
-		Tool = function(input: Vector3)
+		Tool = function(_rel, input: Vector3)
 			local delta = input - last_input
 			UpdateWidth(math.clamp(stroke_width + delta.X * 0.05, MIN_WIDTH, MAX_WIDTH))
 		end,
 	},
+	{
+		KeyCode = Enum.KeyCode.LeftControl,
+		Tool = function(input: Vector3, _raw: Vector3)
+			local l = {}
+			for _, layer in layers do
+				table.insert(l, layer.image.buffer)
+			end
+			local queried = Compositor.queryPixel(l, RESOLUTION, Vector2.new(input.X, input.Y), OSGL.color.WHITE)
+			if queried then
+				Picker:SetColor(Color3.fromRGB(OSGL.color.read(queried)))
+			end
+		end
+	},
 }
 
-local function GetModifierTool(nest) : ((Vector3) -> ())?
+local function GetModifierTool(nest) : ((Vector3, Vector3) -> ())?
 	local search = if nest ~= nil then nest else KeyModifierTools
 	for _, val in search do
 		if UserInputService:IsKeyDown(val.KeyCode) then
@@ -754,7 +768,7 @@ RunService.RenderStepped:Connect(function()
 		if tool then
 			local raw_input = Vector3.new(rawPos.X, rawPos.Y, p)
 			if last_input ~= nil then
-				tool(raw_input)
+				tool(input, raw_input)
 			end
 			last_input = raw_input
 			return
