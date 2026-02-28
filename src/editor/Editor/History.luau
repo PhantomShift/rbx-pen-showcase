@@ -73,6 +73,12 @@ function History.getMemMB()
 	return (History.undo_mem + History.redo_mem) / MEGA
 end
 
+function History.clearUndoStack()
+	History.redo_mem = 0
+	table.clear(History.undo_stack)
+	MemoryChanged:Fire()
+end
+
 function History.clearRedoStack()
 	History.redo_mem = 0
 	table.clear(History.redo_stack)

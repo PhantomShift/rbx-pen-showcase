@@ -6,3 +6,5 @@ realm = "shared"
 
 [dependencies]
 OSGL = "gunshotsoundstudios/osgl@0.1.629"
+Promise = "howmanysmall/typed-promise@4.0.6"
+janitor = "howmanysmall/janitor@1.18.3"

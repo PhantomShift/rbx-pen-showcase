@@ -9,6 +9,8 @@ local Players = game:GetService("Players")
 local PlayerGui = Players.LocalPlayer.PlayerGui
 
 local OSGL = require(ReplicatedStorage.Packages.OSGL)
+local Promise = require(ReplicatedStorage.Packages.Promise)
+local Janitor = require(ReplicatedStorage.Packages.janitor)
 local ColorPicker = require(ReplicatedStorage.External.ColorPicker)
 
 local CurveEditor = require(ReplicatedStorage.Shared.CurveEditor)
@@ -32,12 +34,32 @@ local RightDock = MainWindow.RightDock
 
 local Prompt = MainWindow.Prompt
 
+local PJ = Janitor.new()
 Prompt.Close.Activated:Connect(function()
 	Prompt.Visible = false
 end)
-local function ShowPrompt(text: string)
+local function ShowPrompt(text: string, choices: {["Ok" | "Cancel"]: boolean?}?)
+	PJ:Cleanup()
+
+	if choices == nil then
+		choices = { Ok = true }
+	end
+
+	local events = { Close = Prompt.Close.Activated }
+	for _, child in Prompt.Options:GetChildren() do
+		if child:IsA("GuiButton") then
+			child.Visible = choices[child.Name]
+			events[child.Name] = child.Activated
+			PJ:Add(child.Activated:Connect(function()
+				Prompt.Visible = false
+			end))
+		end
+	end
+
 	Prompt.TextBox.Text =text
 	Prompt.Visible = true
+
+	return events
 end
 Prompt.Visible = false
 
@@ -585,6 +607,42 @@ local PenSettings = SettingsPages.PenSettings
 local PressureCurveEditor = CurveEditor.new(PenSettings.PressureCurve, {Color3 = Color3.new(1, 1, 1)})
 PenSettings.PressureCurveReset.Activated:Connect(function()
 	PressureCurveEditor:Reset()
+end)
+
+local function ResetDrawing()
+	while #layers > 0 do
+		DeleteLayer(#layers)
+	end
+
+	CreateLayer()
+	History.clearUndoStack()
+	History.clearRedoStack()
+
+	updateZoomSnapped(9)
+	layers[1].image:Render()
+end
+
+BottomBar.Reset.Activated:Connect(function()
+	if PJ:Get("connecting") then
+		return
+	end
+
+	local activate = ShowPrompt(
+		"Are you sure you want to reset the canvas?\nThis action will wipe the history and cannot be undone.",
+		{ Confirm = true, Cancel = true }
+	)
+
+	local promises = {}
+	for choice, activation in pairs(activate) do
+		table.insert(promises, Promise.fromEvent(activation):andThenReturn(choice))
+	end
+	
+	local promise = Promise.any(promises)
+	PJ:AddPromise(promise)
+	local _cancelled, choice = promise:await()
+	if choice == "Confirm" then
+		ResetDrawing()
+	end
 end)
 
 DrawWindow.InputBegan:Connect(onDrawWindowScroll)
