@@ -51,7 +51,7 @@ which should be added manually to the `external` directory in the filesystem or 
 rojo build -o showcase.rbxlx
 ```
 
-> ![WARNING]
+> [!WARNING]
 > At the time of writing, a problem with [StyleRule serialization](https://github.com/rojo-rbx/rbx-dom/issues/597)
 > prevents the resultant `.rbxlx` file from being imported into Studio successfully.
 > As a temporary workaround, the provided script `FixImport.luau`
