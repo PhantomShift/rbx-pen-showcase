@@ -1,0 +1,111 @@
+{
+  "name": "rbx-pen-showcase",
+  "tree": {
+    "$className": "DataModel",
+    "Lighting": {
+      "$properties": {
+        "Ambient": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Brightness": 2.0,
+        "GlobalShadows": true,
+        "Outlines": false,
+        "Technology": "Voxel"
+      }
+    },
+    "ReplicatedStorage": {
+      "Design": {
+        "$path": "src/design/Design.rbxmx"
+      },
+      "Packages": {
+        "$path": "Packages"
+      },
+      "External": {
+        "$path": "external"
+      },
+      "Shared": {
+        "$path": "src/shared"
+      }
+    },
+    "ServerScriptService": {
+      "Server": {
+        "$path": "src/server"
+      }
+    },
+    "SoundService": {
+      "$properties": {
+        "RespectFilteringEnabled": true
+      }
+    },
+    "StarterGui": {
+      "EditorGui": {
+        "$className": "ScreenGui",
+        "$properties": {
+          "ZIndexBehavior": "Sibling"
+        },
+        "$path": "src/editor"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/client"
+        }
+      }
+    },
+    "Workspace": {
+      "Baseplate": {
+        "$className": "Part",
+        "$properties": {
+          "Anchored": true,
+          "CFrame": [
+            0.0,
+            -10.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "Color": {
+            "Color3uint8": [
+              98,
+              94,
+              98
+            ]
+          },
+          "Locked": true,
+          "Position": [
+            0.0,
+            -10.0,
+            0.0
+          ],
+          "Size": [
+            512.0,
+            20.0,
+            512.0
+          ]
+        }
+      },
+      "$properties": {
+        "FilteringEnabled": true,
+        "NextGenerationReplication": {
+          "Enum": 0
+        },
+        "PlayerScriptsUseInputActionSystem": {
+          "Enum": 0
+        },
+        "UseFixedSimulation": {
+          "Enum": 0
+        }
+      }
+    }
+  }
+}

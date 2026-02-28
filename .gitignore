@@ -1,0 +1,8 @@
+Packages/
+
+*.zip
+*.rbxl
+*.rbxlx
+.luaurc
+
+sourcemap.json
