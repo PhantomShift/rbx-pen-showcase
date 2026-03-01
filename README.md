@@ -30,6 +30,29 @@ be usable on other platforms since OpenTabletDriver is cross-platform, however:
 If you'd like to add implementations for other platforms yourself,
 please feel free to open a pull request!
 
+<details>
+<summary>Setup (Windows-Only For Now)</summary>
+
+If you plan on working on this project yourself, the following steps are needed to enable pen pressure mapping.
+
+1) Install [OpenTabletDriver](https://opentabletdriver.net/). Note that this requires you **uninstall** any other drawing tablet drivers you currently have installed.
+Additionally check their [compatibility list](https://opentabletdriver.net/Tablets) to see if your drawing tablet is actually supported.
+
+> Note - Although the [VMulti Driver](https://github.com/X9VoiD/vmulti-bin/releases/latest) is not required for the demo to function properly since it is read via controller input instead of Windows Ink,
+> you will still want it for pen pressure in other applications if you plan on switching to OpenTabletDriver permanently.
+
+2) Install [ViGemBus driver](https://github.com/nefarius/ViGEmBus/releases). Yes, I am fully aware that the project has been archived and abandoned for 3 years,
+but honestly, could not find an actual alternative that had an actual programmable API and isn't *even older*.
+
+3) Download and add the [pressure mapper plugin](https://github.com/PhantomShift/rbx-pen-showcase/releases).
+The simplest installation method is opening the plugin manager in OpentabletDriver and dragging the zip file.
+
+5) Enable the plugin via the `Filters` tab in OpenTabletDriver.
+
+If everything has been installed and set up correctly, you should successfully hear one indication sound that a controller has been "connected". You can confirm that pressure is working by searching Windows for "Set up USB game controller" and checking that Z-axis shifts left when applying pressure.
+
+</details>
+
 ## OpenTabletDriver Plugin Build Instructions
 
 Requirements:
