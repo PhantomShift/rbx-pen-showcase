@@ -668,6 +668,10 @@ BottomBar.Screenshot.Activated:Connect(function()
 	currScreenshot = nil
 end)
 
+local function isPopupOpen()
+	return Prompt.Visible or SettingsWindow.Visible or currScreenshot ~= nil
+end
+
 DrawWindow.InputBegan:Connect(onDrawWindowScroll)
 DrawWindow.InputChanged:Connect(onDrawWindowScroll)
 
@@ -771,6 +775,8 @@ RunService.RenderStepped:Connect(function()
 		return
 	end
 
+	local popupOpen = isPopupOpen()
+
 	local image = layers[curr_layer].image
 	local label = layers[curr_layer].label
 
@@ -779,7 +785,7 @@ RunService.RenderStepped:Connect(function()
 	local isHover, posX, posY = image:GetRelativeMousePosition(label)
 	local input = Vector3.new(posX, posY, p)
 	Preview.Visible = DrawWindow.GuiState == Enum.GuiState.Hover or isHover
-	UserInputService.MouseIconEnabled = not (Preview.Visible)
+	UserInputService.MouseIconEnabled = popupOpen or not (Preview.Visible)
 	Preview.Position = UDim2.fromOffset(rawPos.X, rawPos.Y)
 	Preview.Size = if isDrawing
 		then UDim2.fromOffset(p * stroke_width * zoom_percent, p * stroke_width * zoom_percent)
@@ -800,6 +806,7 @@ RunService.RenderStepped:Connect(function()
 	if not isDrawing
 		or not isHover
 		or (usePressure and p == 0)
+		or popupOpen
 	then
 		if History.inStroke() then
 			History.pushUndoClear(History.finishCircleStroke())
