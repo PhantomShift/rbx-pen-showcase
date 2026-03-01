@@ -17,6 +17,7 @@ local CurveEditor = require(ReplicatedStorage.Shared.CurveEditor)
 local Compositor = require(ReplicatedStorage.Shared.Compositor)
 
 local History = require(script.History)
+local Gallery = require(script.Gallery)
 
 local HEIGHT = 1024
 local WIDTH = 1024
@@ -646,6 +647,27 @@ BottomBar.Reset.Activated:Connect(function()
 	end
 end)
 
+local currScreenshot: Promise.Promise? = nil
+BottomBar.Screenshot.Activated:Connect(function()
+	if currScreenshot then
+		return
+	end
+
+	local l = {}
+	for i, layer in layers do
+		l[i] = layer.image.buffer
+	end
+	currScreenshot = Gallery.Save(layers[1].label.ImageContent.Object, l, RESOLUTION):catch(function(message)
+		if type(message) == "string" then
+			ShowPrompt(`Error: Failed to Save\nMessage: {message}`)
+		else
+			ShowPrompt("Screenshot failed for unknown reasons")
+		end
+	end)
+	currScreenshot:await()
+	currScreenshot = nil
+end)
+
 DrawWindow.InputBegan:Connect(onDrawWindowScroll)
 DrawWindow.InputChanged:Connect(onDrawWindowScroll)
 
@@ -756,8 +778,8 @@ RunService.RenderStepped:Connect(function()
 	local rawPos = UserInputService:GetMouseLocation() - MainWindow.AbsolutePosition - GuiService:GetGuiInset()
 	local isHover, posX, posY = image:GetRelativeMousePosition(label)
 	local input = Vector3.new(posX, posY, p)
-	UserInputService.MouseIconEnabled = not isHover
 	Preview.Visible = DrawWindow.GuiState == Enum.GuiState.Hover or isHover
+	UserInputService.MouseIconEnabled = not (Preview.Visible)
 	Preview.Position = UDim2.fromOffset(rawPos.X, rawPos.Y)
 	Preview.Size = if isDrawing
 		then UDim2.fromOffset(p * stroke_width * zoom_percent, p * stroke_width * zoom_percent)

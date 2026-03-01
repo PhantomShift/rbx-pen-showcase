@@ -28,7 +28,7 @@ export type Compositor = {
 local scratchUnder: EditableImage? = nil
 local scratchOver: EditableImage? = nil
 
-local function tryInit(size: Vector2)
+local function tryInit(size: Vector2, initOnlyUnder: boolean?)
 	if scratchUnder and scratchOver then
 		scratchUnder:Destroy()
 		scratchOver:Destroy()
@@ -36,6 +36,9 @@ local function tryInit(size: Vector2)
 		scratchOver = nil
 	end
 	local success, under, over = pcall(function()
+		if initOnlyUnder then
+			return AssetService:CreateEditableImage({Size = size})
+		end
 		return AssetService:CreateEditableImage({Size = size}), AssetService:CreateEditableImage({Size = size})
 	end)
 	if success then
@@ -100,18 +103,23 @@ function Compositor.cascadeOverFast(destination: buffer, layers: {buffer}, size:
 	return true
 end
 
-function Compositor.cascadeOverFastDirect(destination: EditableImage, background: buffer, layers: {buffer}, size: Vector2) : boolean
-	if scratchUnder == nil or scratchUnder.Size ~= size then
-		if not tryInit(size) then
-			return false
+function Compositor.cascadeOverFastDirect(destination: EditableImage, background: buffer, layers: {buffer}, size: Vector2, scratch: EditableImage?) : boolean
+	if scratch == nil then
+		if scratchUnder == nil or scratchUnder.Size ~= size then
+			if not tryInit(size, true) then
+				return false
+			end
 		end
+		scratch = scratchUnder
+	elseif scratch.Size.X < size.X or scratch.Size.Y < size.Y then
+		return false
 	end
-    assert(scratchOver)
+    assert(scratch)
 	
 	destination:WritePixelsBuffer(Vector2.zero, size, background)
 	for _, layer in layers do
-		scratchOver:WritePixelsBuffer(Vector2.zero, size, layer)
-		destination:DrawImage(Vector2.zero, scratchOver, Enum.ImageCombineType.BlendSourceOver)
+		scratch:WritePixelsBuffer(Vector2.zero, size, layer)
+		destination:DrawImage(Vector2.zero, scratch, Enum.ImageCombineType.BlendSourceOver)
 	end
 
 	return true
