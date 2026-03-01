@@ -45,7 +45,7 @@ Additionally check their [compatibility list](https://opentabletdriver.net/Table
 but honestly, could not find an actual alternative that had an actual programmable API and isn't *even older*.
 
 3) Download and add the [pressure mapper plugin](https://github.com/PhantomShift/rbx-pen-showcase/releases).
-The simplest installation method is opening the plugin manager in OpentabletDriver and dragging the zip file.
+The simplest installation method is opening the plugin manager in OpenTabletDriver and dragging the zip file.
 
 5) Enable the plugin via the `Filters` tab in OpenTabletDriver.
 
@@ -104,9 +104,8 @@ scheme in order to allow for an arbitrary number of layers:
 Additional future plans for the paint program specifically include in no particular order:
 
 - Additional settings and shortcuts, saving settings between sessions
-- Saving, loading and sharing drawings
+- Saving, loading and sharing drawings (note: requires special consideration for upcoming [DataStore limits](https://create.roblox.com/docs/cloud-services/data-stores/error-codes-and-limits#storage-limits))
 - More advanced brush engine
-- Online [`ora` format](https://en.wikipedia.org/wiki/OpenRaster) export pipeline (temporarily stored and available for download via provided link)
 - Multiplayer drawing mode
 - Resizing docks/windows
 
