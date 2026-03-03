@@ -1,4 +1,6 @@
 Packages/
+external/*.rbxm
+external/*.rbxlx
 
 *.zip
 *.rbxl
