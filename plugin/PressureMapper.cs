@@ -1,24 +1,53 @@
-﻿using Nefarius.ViGEm.Client;
-using Nefarius.ViGEm.Client.Targets;
-using Nefarius.ViGEm.Client.Targets.Xbox360;
+﻿using System.Numerics;
+using OpenTabletDriver.Plugin;
 using OpenTabletDriver.Plugin.Attributes;
 using OpenTabletDriver.Plugin.Output;
 using OpenTabletDriver.Plugin.Tablet;
 
-namespace pressure_mapper;
+#if WINDOWS
+using PressureMapper.Windows;
+#elif LINUX
+using PressureMapper.Linux;
+#endif
+
+namespace PressureMapper;
+
+public enum ControllerButton
+{
+    A,
+    B,
+}
+
+public enum ControllerSide
+{
+    Left,
+    Right,
+}
+
+public class IVirtController
+{
+    public virtual void ToggleButton(ControllerButton button, bool toggle) { }
+    public virtual void SetThumbstick(ControllerSide side, Vector2 value, float max) { }
+    public virtual void SetTrigger(ControllerSide side, float value, float max) { }
+    public virtual void Report() { }
+}
 
 [PluginName("Pen to Controller Mapper")]
 public class ControllerMapper : IPositionedPipelineElement<IDeviceReport>
 {
-    readonly private static ViGEmClient client;
-    private static IXbox360Controller controller;
     private uint maxPressure = 4096;
+    private readonly static IVirtController controller;
+
     static ControllerMapper()
     {
-        client = new();
-        controller = client.CreateXbox360Controller();
-        controller.AutoSubmitReport = false;
-        controller.Connect();
+#if WINDOWS
+        controller = new VigEmController();
+#elif LINUX
+        controller = new UinputController();
+#else
+        controller = new IVirtController();
+        Log.WriteNotify("PressureMapper", "No virtual controller implementation is available for the current device.", LogLevel.Warning);
+#endif
     }
 
     [TabletReference]
@@ -27,7 +56,7 @@ public class ControllerMapper : IPositionedPipelineElement<IDeviceReport>
         set => maxPressure = value.Properties.Specifications.Pen.MaxPressure;
     }
 
-    
+
     [Property("Enable Tilt"), DefaultPropertyValue(false)]
     public bool EnableTilt { set; get; }
 
@@ -40,26 +69,23 @@ public class ControllerMapper : IPositionedPipelineElement<IDeviceReport>
     {
         if (device_report is ITabletReport tablet)
         {
-            var ratio = (float)tablet.Pressure / (float)maxPressure;
-            controller.SetSliderValue(Xbox360Slider.RightTrigger, (byte)(ratio * 255.0f));
-            controller.SetButtonState(Xbox360Button.A, tablet.PenButtons[0]);
-            controller.SetButtonState(Xbox360Button.B, tablet.PenButtons[1]);
+            controller.SetTrigger(ControllerSide.Right, tablet.Pressure, maxPressure);
+            controller.ToggleButton(ControllerButton.A, tablet.PenButtons[0]);
+            controller.ToggleButton(ControllerButton.B, tablet.PenButtons[1]);
         }
         if (EnableTilt && device_report is ITiltReport tilt)
         {
-            controller.SetAxisValue(Xbox360Axis.LeftThumbX, (short)(tilt.Tilt.X / MaxTilt * short.MaxValue));
-            controller.SetAxisValue(Xbox360Axis.LeftThumbY, (short)(tilt.Tilt.Y / MaxTilt * short.MaxValue));
+            controller.SetThumbstick(ControllerSide.Left, new Vector2(tilt.Tilt.X, tilt.Tilt.Y), MaxTilt);
         }
         if (device_report is OutOfRangeReport)
         {
-            controller.SetSliderValue(Xbox360Slider.RightTrigger, 0);
-            controller.SetButtonState(Xbox360Button.A, false);
-            controller.SetButtonState(Xbox360Button.B, false);
-            controller.SetAxisValue(Xbox360Axis.LeftThumbX, 0);
-            controller.SetAxisValue(Xbox360Axis.LeftThumbY, 0);
+            controller.SetTrigger(ControllerSide.Right, 0, maxPressure);
+            controller.ToggleButton(ControllerButton.A, false);
+            controller.ToggleButton(ControllerButton.B, false);
+            controller.SetThumbstick(ControllerSide.Left, Vector2.Zero, short.MaxValue);
         }
 
-        controller.SubmitReport();
+        controller.Report();
         Emit?.Invoke(device_report);
     }
 }

@@ -2,7 +2,7 @@
     "Name": "Pen Pressure to Controller Mapper",
     "Owner": "PhantomShift",
     "Description": "Maps pen pressure to a virtual controller's trigger actuation.",
-    "PluginVersion": "0.0.1.0",
+    "PluginVersion": "0.0.2.0",
     "SupportedDriverVersion": "0.6.6.2",
     "RepositoryUrl": "https://github.com/PhantomShift/rbx-pen-showcase",
     "DownloadUrl": "",
