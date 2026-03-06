@@ -57,10 +57,10 @@ public class ControllerMapper : IPositionedPipelineElement<IDeviceReport>
     }
 
 
-    [Property("Enable Tilt"), DefaultPropertyValue(false)]
+    [Property("Enable Tilt"), DefaultPropertyValue(false), ToolTip("If enabled and your pen supports it, outputs tilt as a thumbstick position.")]
     public bool EnableTilt { set; get; }
 
-    [Property("Maximum Tilt"), DefaultPropertyValue(60.0f)]
+    [Property("Maximum Tilt"), DefaultPropertyValue(60.0f), ToolTip("Sets the tilt at which a thumbstick would be at its maximum angle.")]
     public float MaxTilt { set; get; }
 
     public PipelinePosition Position => PipelinePosition.PostTransform;
