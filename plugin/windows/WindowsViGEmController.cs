@@ -40,7 +40,7 @@ public class VigEmController : IVirtController
         };
 
         controller.SetAxisValue(x, (short)(value.X / max * short.MaxValue));
-        controller.SetAxisValue(y, (short)(value.X / max * short.MaxValue));
+        controller.SetAxisValue(y, (short)(-value.Y / max * short.MaxValue));
     }
 
     public override void SetTrigger(ControllerSide side, float value, float max)

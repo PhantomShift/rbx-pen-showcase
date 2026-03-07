@@ -7,11 +7,16 @@
     <Nullable>enable</Nullable>
     <CopyLocalLockFileAssembles>true</CopyLocalLockFileAssembles>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('linux'))">
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <DefineConstants>$(DefineConsants);WINDOWS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
     <DefineConstants>$(DefineConsants);LINUX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <!-- Stuff for if I or someone else bothers writing a MacOS implementation  -->
   </PropertyGroup>
 
   <ItemGroup>
